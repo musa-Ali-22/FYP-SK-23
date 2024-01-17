@@ -1,0 +1,114 @@
+if(mode==2){    
+//===============================================================================
+//                          Obstacle Avoiding Control
+//===============================================================================     
+ distance_F = Ultrasonic_read();
+ Serial.print("S=");Serial.println(distance_F);
+  if (distance_F > set){forword();}
+    else{Check_side();}
+}
+
+delay(10);
+}
+
+long IRremote_data(){
+     if(results.value==0xFF02FD){IR_data=1;}  
+else if(results.value==0xFF9867){IR_data=2;} 
+else if(results.value==0xFFE01F){IR_data=3;} 
+else if(results.value==0xFF906F){IR_data=4;} 
+else if(results.value==0xFF629D || results.value==0xFFA857){IR_data=5;} 
+else if(results.value==0xFF30CF){IR_data=8;} 
+else if(results.value==0xFF18E7){IR_data=9;} 
+else if(results.value==0xFF7A85){IR_data=10;} 
+return IR_data;
+}
+
+void servoPulse (int pin, int angle){
+int pwm = (angle*11) + 500;      // Convert angle to microseconds
+ digitalWrite(pin, HIGH);
+ delayMicroseconds(pwm);
+ digitalWrite(pin, LOW);
+ delay(50);                   // Refresh cycle of servo
+}
+
+
+//**********************Ultrasonic_read****************************
+long Ultrasonic_read(){
+  digitalWrite(trigger, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigger, HIGH);
+  delayMicroseconds(10);
+  distance = pulseIn (echo, HIGH);
+  return distance / 29 / 2;
+}
+
+void compareDistance(){
+       if (distance_L > distance_R){
+  turnLeft();
+  delay(350);
+  }
+  else if (distance_R > distance_L){
+  turnRight();
+  delay(350);
+  }
+  else{
+  backword();
+  delay(300);
+  turnRight();
+  delay(600);
+  }
+}
+
+void Check_side(){
+    Stop();
+    delay(100);
+ for (int angle = 70; angle <= 140; angle += 5)  {
+   servoPulse(servo, angle);  }
+    delay(300);
+    distance_L = Ultrasonic_read();
+    delay(100);
+  for (int angle = 140; angle >= 0; angle -= 5)  {
+   servoPulse(servo, angle);  }
+    delay(500);
+    distance_R = Ultrasonic_read();
+    delay(100);
+ for (int angle = 0; angle <= 70; angle += 5)  {
+   servoPulse(servo, angle);  }
+    delay(300);
+    compareDistance();
+}
+
+void forword(){  //forword
+digitalWrite(in1, HIGH); //Right Motor forword Pin 
+digitalWrite(in2, LOW);  //Right Motor backword Pin 
+digitalWrite(in3, LOW);  //Left Motor backword Pin 
+digitalWrite(in4, HIGH); //Left Motor forword Pin 
+}
+
+void backword(){ //backword
+digitalWrite(in1, LOW);  //Right Motor forword Pin 
+digitalWrite(in2, HIGH); //Right Motor backword Pin 
+digitalWrite(in3, HIGH); //Left Motor backword Pin 
+digitalWrite(in4, LOW);  //Left Motor forword Pin 
+}
+
+void turnRight(){ //turnRight
+digitalWrite(in1, LOW);  //Right Motor forword Pin 
+digitalWrite(in2, HIGH); //Right Motor backword Pin  
+digitalWrite(in3, LOW);  //Left Motor backword Pin 
+digitalWrite(in4, HIGH); //Left Motor forword Pin 
+}
+
+void turnLeft(){ //turnLeft
+digitalWrite(in1, HIGH); //Right Motor forword Pin 
+digitalWrite(in2, LOW);  //Right Motor backword Pin 
+digitalWrite(in3, HIGH); //Left Motor backword Pin 
+digitalWrite(in4, LOW);  //Left Motor forword Pin 
+}
+
+void Stop(){ //stop
+digitalWrite(in1, LOW); //Right Motor forword Pin 
+digitalWrite(in2, LOW); //Right Motor backword Pin 
+digitalWrite(in3, LOW); //Left Motor backword Pin 
+digitalWrite(in4, LOW); //Left Motor forword Pin 
+}
