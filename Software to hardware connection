@@ -1,0 +1,13 @@
+#include <SoftwareSerial.h>
+SoftwareSerial BT_Serial(2, 3); // RX, TX
+
+#include <IRremote.h>
+const int RECV_PIN = A5;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+if(BT_Serial.available() > 0){  //if some data is sent, reads it and saves in state     
+bt_ir_data = BT_Serial.read(); 
+Serial.println(bt_ir_data);     
+if(bt_ir_data > 20){Speed = bt_ir_data;}      
+}
